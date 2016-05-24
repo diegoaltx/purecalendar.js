@@ -1,204 +1,309 @@
+/**
+ * @namespace purecalendar
+ */
 var purecalendar = (function() {
-
     'use strict';
 
     /**
-     * @param {Date} date
+     * @class {CalendarDay}
+     * @memberOf purecalendar
+     * @param {purecalendar.Calendar} calendar
+     * @param {number=} year
+     * @param {number=} month
+     * @param {number=} day
+     * @property {purecalendar.Calendar} calendar
      * @property {Date} value
-     * @property {number} year
-     * @property {number} monthIndex
-     * @property {number} month
-     * @property {number} day
-     * @property {number} weekDayIndex
-     * @property {number} weekDay
-     * @property {boolean} isWeekend
-     * @property {boolean} isToday
      * @constructor
      */
-    function CalendarDate(date) {
-        this.value = date;
-        this.year = date.getFullYear();
-        this.monthIndex = date.getMonth();
-        this.month = this.monthIndex + 1;
-        this.day = date.getDate();
-        this.weekDayIndex = date.getDay();
-        this.weekDay = this.weekDayIndex + 1;
-        this.isWeekend = [0,6].indexOf(this.weekDayIndex) > -1;
-        this.isToday = (new Date()).toDateString() === date.toDateString();
-    }
-
-    /**
-     * @returns {string}
-     */
-    Calendar.prototype.toString = function() {
-        var date = this.value;
-        return [date.getFullYear(), date.getMonth(), date.getDate()].join('-');
-    };
-
-    /**
-     * @param {number} year
-     * @param {number} month
-     * @property {number} year
-     * @property {number} month
-     * @property {CalendarDate[]} dates
-     * @property {CalendarDate} firstDate
-     * @property {CalendarDate} lastDate
-     * @property {CalendarDate} today
-     * @property {boolean} isCurrentMonth
-     * @returns {Calendar}
-     * @constructor
-     */
-    function Calendar(year, month) {
-
-        this.today = new CalendarDate(new Date());
-
-        this.year = (year ? year : this.today.year);
-        this.month = (month ? month : this.today.month);
-        this.monthIndex = this.month - 1;
-
-        var first = this.firstDateOfWeek(new Date(this.year, this.month - 1));
-        var last = this.lastDateOfWeek(new Date(this.year, this.month, 0));
-        this.firstDate = new CalendarDate(first);
-        this.lastDate = new CalendarDate(last);
-
-        this.isCurrentMonth = (this.year === this.today.year && this.month === this.today.month);
-
-        this.dates = [];
-        var current = first;
-
-        do {
-            this.dates.push(new CalendarDate(current));
-            current = this.nextDate(current);
-        } while (current <= last);
-
-        return this;
-    }
-
-    /**
-     * @param {Date} date
-     * @returns {Date}
-     */
-    Calendar.prototype.firstDateOfWeek = function(date) {
-        var currentDate = date;
-        while(!this.isFirstDateOfWeek(currentDate)) {
-            currentDate = this.previousDate(currentDate);
-        }
-        return currentDate;
-    };
-
-    /**
-     * @param {Date} date
-     * @returns {Date}
-     */
-    Calendar.prototype.lastDateOfWeek = function(date) {
-        var currentDate = date;
-        while(!this.isLastDateOfWeek(currentDate)) {
-            currentDate = this.nextDate(currentDate);
-        }
-        return currentDate;
-    };
-
-    /**
-     * @param {Date} date
-     * @returns {Date}
-     */
-    Calendar.prototype.previousDate = function(date) {
-        if(this.isFirstDateOfYear(date)) {
-            return new Date(date.getFullYear() - 1, 11, 31);
-        }
-        if(this.isFirstDateOfMonth(date)) {
-            return new Date(date.getFullYear(), date.getMonth(), 0);
-        }
-        return new Date(date.getFullYear(), date.getMonth(), date.getDate() - 1);
-    };
-
-    /**
-     * @param {Date} date
-     * @returns {Date}
-     */
-    Calendar.prototype.nextDate = function(date) {
-        if(this.isLastDateOfYear(date)) {
-            return new Date(date.getFullYear() + 1, 0, 1);
-        }
-        if(this.isLastDateOfMonth(date)) {
-            return new Date(date.getFullYear(), date.getMonth() + 1, 1);
-        }
-        return new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1);
-    };
-
-    /**
-     * @param {Date} date
-     * @returns {boolean}
-     */
-    Calendar.prototype.isFirstDateOfMonth = function(date) {
-        return date.getDate() === 1;
-    };
-
-    /**
-     * @param {Date} date
-     * @returns {boolean}
-     */
-    Calendar.prototype.isLastDateOfMonth = function(date) {
-        var lastDayOfMonth;
-        if(this.isLastMonthOfYear(date)) {
-            lastDayOfMonth = new Date(date.getFullYear() + 1, 0, 0);
+    function CalendarDay(calendar, year, month, day) {
+        this.calendar = calendar;
+        if(arguments.length == 4) {
+            this.value = new Date(year, month - 1, day);
         } else {
-            lastDayOfMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+            this.value = new Date();
         }
-        return date.getDate() === lastDayOfMonth.getDate();
+    }
+
+    CalendarDay.prototype =
+    /**
+     * @lends {purecalendar.CalendarDay}
+     */
+    {
+        constructor: CalendarDay,
+
+        /**
+         * @property {number} year
+         */
+        get year() {
+            return this.value.getFullYear();
+        },
+
+        /**
+         * @property {number} monthIndex
+         */
+        get monthIndex() {
+            return this.value.getMonth();
+        },
+
+        /**
+         * @property {number} month
+         */
+        get month() {
+            return this.value.getMonth() + 1;
+        },
+
+        /**
+         * @property {number} day
+         */
+        get day() {
+            return this.value.getDate();
+        },
+
+        /**
+         * @property {number} weekDayIndex
+         */
+        get weekDayIndex() {
+            return this.value.getDay();
+        },
+
+        /**
+         * @property {number} weekDay
+         */
+        get weekDay() {
+            return this.value.getDay() + 1;
+        },
+
+        /**
+         * @property {boolean} isWeekend
+         */
+        get isWeekend() {
+            var weekend = this.calendar.weekend;
+            return weekend.indexOf(this.value.getDay()) > -1;
+        },
+
+        /**
+         * @property {boolean} isToday
+         */
+        get isToday() {
+            var today = this.calendar.today;
+            return this.equal(today);
+        },
+
+        /**
+         * @property {boolean} isFirstDayOfWeek
+         */
+        get isFirstDayOfWeek() {
+            return this.weekDayIndex === this.calendar.firstWeekDay;
+        },
+
+        /**
+         * @property {boolean} isLastDayOfWeek
+         */
+        get isLastDayOfWeek() {
+            return this.weekDayIndex === this.calendar.lastWeekDay;
+        },
+
+        /**
+         * @param {purecalendar.CalendarDay} day
+         * @returns {boolean}
+         */
+        equal: function(day) {
+            return day.value.toDateString() === this.value.toDateString();
+        },
+
+        /**
+         * @returns {purecalendar.CalendarDay}
+         */
+        firstDayOfWeek: function() {
+            var day = this;
+            while(!day.isFirstDayOfWeek) {
+                day = day.previous();
+            }
+            return day;
+        },
+
+        /**
+         * @returns {purecalendar.CalendarDay}
+         */
+        lastDayOfWeek: function() {
+            var day = this;
+            while(!day.isLastDayOfWeek) {
+                day = day.next();
+            }
+            return day;
+        },
+
+        /**
+         * @returns {purecalendar.CalendarDay}
+         */
+        next: function() {
+            return new CalendarDay(this.calendar, this.year, this.month, this.day + 1);
+        },
+
+        /**
+         * @returns {purecalendar.CalendarDay}
+         */
+        previous: function() {
+            return new CalendarDay(this.calendar, this.year, this.month, this.day - 1);
+        }
     };
 
     /**
-     * @param {Date} date
-     * @returns {boolean}
+     * @class {Calendar}
+     * @memberOf purecalendar
+     * @property {number} firstWeekDay
+     * @property {string[]} weekDaysLabels
+     * @property {string[]} monthsLabels
+     * @property {purecalendar.CalendarDay} today
+     * @constructor
      */
-    Calendar.prototype.isFirstMonthOfYear = function(date) {
-        return date.getMonth() === 0;
+    function Calendar(options) {
+        this.firstWeekDay = this.SUNDAY;
+        this.weekend = [this.SUNDAY,this.SATURDAY];
+        this.today = new CalendarDay(this);
+    }
+
+    Calendar.prototype =
+    /**
+     * @lends {purecalendar.Calendar}
+     */
+    {
+        constructor: Calendar,
+        SUNDAY: 0,
+        MONDAY: 1,
+        TUESDAY: 2,
+        WEDNESDAY: 3,
+        THURSDAY: 4,
+        FRIDAY: 5,
+        SATURDAY: 6,
+
+        /**
+         * @property {number} lastWeekDay
+         */
+        get lastWeekDay() {
+            if(this.firstWeekDay == this.SUNDAY) {
+                return this.SATURDAY;
+            }
+            return this.firstWeekDay - 1;
+        },
+
+        /**
+         * @param {number=} year
+         * @param {number=} month
+         * @returns {purecalendar.CalendarMonth}
+         */
+        getMonth: function (year, month) {
+            return new CalendarMonth(this, year, month);
+        }
     };
 
     /**
-     * @param {Date} date
-     * @returns {boolean}
+     * @class {CalendarMonth}
+     * @memberOf purecalendar
+     * @param {purecalendar.Calendar} calendar
+     * @param {number=} year
+     * @param {number=} month
+     * @property {number} year
+     * @property {number} month
+     * @constructor
      */
-    Calendar.prototype.isLastMonthOfYear = function(date) {
-        return date.getMonth() === 11;
-    };
+    function CalendarMonth(calendar, year, month) {
+        this.calendar = calendar;
+        this.year = year || calendar.today.year;
+        this.month = month || calendar.today.month;
+    }
 
+    CalendarMonth.prototype =
     /**
-     * @param {Date} date
-     * @returns {boolean}
+     * @lends {purecalendar.CalendarMonth}
      */
-    Calendar.prototype.isFirstDateOfYear = function(date) {
-        return this.isFirstMonthOfYear(date) && this.isFirstDateOfMonth(date);
-    };
+    {
+        constructor: CalendarMonth,
 
-    /**
-     * @param {Date} date
-     * @returns {boolean}
-     */
-    Calendar.prototype.isLastDateOfYear = function(date) {
-        return this.isLastMonthOfYear(date) && this.isLastDateOfMonth(date);
-    };
+        /**
+         * @property {number} monthIndex
+         */
+        get monthIndex() {
+            return this.month - 1;
+        },
 
-    /**
-     * @param {Date} date
-     * @returns {boolean}
-     */
-    Calendar.prototype.isFirstDateOfWeek = function(date) {
-        return date.getDay() === 0;
-    };
+        /**
+         * @property {boolean} isCurrentMonth
+         */
+        get isCurrentMonth() {
+            var today = this.calendar.today;
+            return (this.year == today.year && this.month == today.month);
+        },
 
-    /**
-     * @param {Date} date
-     * @returns {boolean}
-     */
-    Calendar.prototype.isLastDateOfWeek = function (date) {
-        return date.getDay() === 6;
+        /**
+         * @property {purecalendar.CalendarDay} firstDay
+         */
+        get firstDay() {
+            return (new CalendarDay(this.calendar, this.year, this.month, 1)).firstDayOfWeek();
+        },
+
+        /**
+         * @property {purecalendar.CalendarDay} lastDay
+         */
+        get lastDay() {
+            return (new CalendarDay(this.calendar, this.year, this.month + 1, 0)).lastDayOfWeek();
+        },
+
+        /**
+         * @property {purecalendar.CalendarDay[]} days
+         */
+        get days() {
+            var days = [];
+            var day = this.firstDay;
+            var max = this.lastDay.next();
+
+            do {
+                days.push(day);
+                day = day.next();
+            } while (!day.equal(max));
+
+            return days;
+        },
+
+        /**
+         * @returns {purecalendar.CalendarMonth}
+         */
+        previous: function() {
+            var year = this.year;
+            var month = this.month;
+
+            if(month == 1) {
+                year = year - 1;
+                month = 12;
+            } else {
+                month = month - 1;
+            }
+
+            return new CalendarMonth(this.calendar, year, month);
+        },
+
+        /**
+         * @returns {purecalendar.CalendarMonth}
+         */
+        next: function() {
+            var year = this.year;
+            var month = this.month;
+
+            if(month == 12) {
+                year = year + 1;
+                month = 1;
+            } else {
+                month = month + 1;
+            }
+
+            return new CalendarMonth(this.calendar, year, month);
+        }
     };
 
     return {
-        CalendarDate: CalendarDate,
-        Calendar: Calendar
-    };
+        Calendar: Calendar,
+        CalendarMonth: CalendarMonth,
+        CalendarDay: CalendarDay
+    }
 
 })();
