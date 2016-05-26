@@ -157,7 +157,7 @@ var purecalendar = (function() {
      * @property {purecalendar.CalendarDay} today
      * @constructor
      */
-    function Calendar(options) {
+    function Calendar() {
         this.firstWeekDay = this.SUNDAY;
         this.weekend = [this.SUNDAY,this.SATURDAY];
         this.today = new CalendarDay(this);
