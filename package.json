@@ -1,0 +1,26 @@
+{
+  "name": "purecalendar.js",
+  "version": "1.0.0",
+  "description": "A simple month calendar class for javascript",
+  "main": "purecalendar.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"To run tests, open tests/index.html on browser.\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/diegoteixeir4/purecalendar.js.git"
+  },
+  "keywords": [
+    "calendar",
+    "month"
+  ],
+  "author": "Diego Teixeira <diegoteixeir4@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/diegoteixeir4/purecalendar.js/issues"
+  },
+  "homepage": "https://github.com/diegoteixeir4/purecalendar.js#readme"
+}
