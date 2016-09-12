@@ -1,7 +1,7 @@
 /**
  * @namespace purecalendar
  */
-(function() {
+var purecalendar = (function() {
     'use strict';
 
     /**
@@ -300,18 +300,15 @@
         }
     };
 
-    var purecalendar = {
+    return {
         Calendar: Calendar,
         CalendarMonth: CalendarMonth,
         CalendarDay: CalendarDay
     };
 
-    if(typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
-        // Running as Node.js module
-        module.exports = purecalendar;
-    } else {
-        // Running on browser
-        window.purecalendar = purecalendar;
-    }
-
 })();
+
+if(typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
+    // Running as Node.js module
+    module.exports = purecalendar;
+}
