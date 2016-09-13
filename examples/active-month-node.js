@@ -3,26 +3,25 @@ const purecalendar = require('../purecalendar');
 
 var calendar = new purecalendar.Calendar();
 var month = calendar.getMonth(); // gets active month
-var line;
+var stdout = process.stdout;
+var weekDayLabels = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 
-console.log('S\tM\tT\tW\tT\tF\tS'); // Header
-
-line = [];
+stdout.write(weekDayLabels.join('\t'));
 
 for(var i=0; i < month.days.length; i++) {
-  var dayLabel;
-
-  // Highlight if today
-  if(month.days[i].isToday) {
-    dayLabel = '[' +  month.days[i].day + ']';
+  if(month.days[i].isFirstDayOfWeek) {
+    stdout.write('\n');
   } else {
-    dayLabel = month.days[i].day;
+    stdout.write('\t');
   }
 
-  line.push(dayLabel);
-
-  if(line.length === 7) {
-    console.log(line.join('\t')); // Output calendar line
-    line = [];
+  if(month.days[i].isToday) {
+    // Highlight active day
+    stdout.write('[' +  month.days[i].day + ']');
+  } else if(month.days[i].month === month.month) {
+    // Hide if not in active month
+    stdout.write(month.days[i].day.toString());
   }
 }
+
+stdout.write('\n');
